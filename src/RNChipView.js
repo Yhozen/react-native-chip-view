@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component } from "react"
 import {
   ViewPropTypes,
   View,
@@ -13,10 +13,14 @@ import Avatar from './Avatar'
 
 import style from "./RNChipView.style";
 
-import select from '../assets/select.png'
-import cancel from '../assets/cancel.png'
-
 class RNChipView extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      selected: false
+    }
+    this._onPress = this._onPress.bind(this)
+  }
 
   static propTypes = {
     title: PropTypes.string,
@@ -91,54 +95,9 @@ class RNChipView extends Component {
       </View>
     );
   }
-
-  _renderAction() {
-    let {
-      selectable,
-      selectableStyle,
-      cancelable,
-      cancelableStyle,
-      height,
-      disabled,
-      editable
-    } = this.props;
-
-    let icon,
-      styles = [],
-      actionStyle = [];
-
-    styles.push(style.actionContainer);
-    actionStyle.push(style.actionIcon);
-
-    height &&
-      styles.push({
-        width: height / 2,
-        height: height / 2,
-        borderRadius: height / 2
-      });
-    height && actionStyle.push({ width: height / 3, height: height / 3 });
-
-    if (!editable)
-      return null
-    else if (selectable) {
-      selectableStyle && !disabled && styles.push(selectableStyle);
-      if (selectable == true)
-        icon = <Image source={select} style={actionStyle} />;
-      else if (typeof selectable === "number")
-        icon = <Image source={selectable} style={actionStyle} />;
-      else icon = selectable;
-    } else if (cancelable) {
-      cancelableStyle && !disabled && styles.push(cancelableStyle);
-
-      if (cancelable == true)
-        icon = <Image source={cancel} style={actionStyle} />;
-      else if (typeof cancelable === "number")
-        icon = <Image source={cancelable} style={actionStyle} />;
-      else icon = cancelable;
-    }
-    else return null;
-
-    return <View style={styles}>{icon}</View>;
+  _onPress(...params) {
+    this.props.onPress({[this.props.value]: !this.state.selected}, ...params)
+    this.setState({selected: !this.state.selected}, () => {})
   }
 
   _renderContent() {
@@ -151,8 +110,11 @@ class RNChipView extends Component {
       disabled,
       editable,
       titleAllowFontScaling,
-      disableTitleStyle
+      disableTitleStyle,
+      selectable,
+      titleActiveStyle
     } = this.props;
+    let { selected } = this.state
     let styles = [],
       contentContainerStyles = [],
       subStyles = [];
@@ -162,6 +124,7 @@ class RNChipView extends Component {
 
     styles.push(style.title);
     titleStyle && styles.push(titleStyle);
+    (selectable & selected) && styles.push(titleActiveStyle)
 
     subStyles.push(style.subContentContainer);
     subStyles.push(subContentContainerStyle);
@@ -172,7 +135,7 @@ class RNChipView extends Component {
     if (disabled) { styles.push(disableTitleStyle) || styles.push(style.disabledTitleStyle) }
 
     return (
-    <TouchableOpacity style={{ flex: 1 }} onPress={this.props.onPress} disabled={disabled || !editable}>
+    <TouchableOpacity style={{ flex: 1 }} onPress={this._onPress} disabled={disabled || !editable}>
         <View style={contentContainerStyles}>
           {this._renderAvatar()}
           <View style={[subStyles]}>
@@ -185,15 +148,14 @@ class RNChipView extends Component {
               {this.props.title}
             </Text>
           </View>
-          {this._renderAction()}
         </View>
       </TouchableOpacity>
     );
   }
 
   _renderContainer() {
-    let { backgroundColor, height, borderRadius, containerStyle, disabled, disableStyle } = this.props;
-
+    let { backgroundColor, height, borderRadius, containerStyle, disabled, disableStyle, selectable, containerActiveStyle } = this.props;
+    let { selected } = this.state
     let styles = [];
     styles.push(style.container);
     styles.push(containerStyle);
@@ -201,6 +163,7 @@ class RNChipView extends Component {
     backgroundColor && styles.push({ backgroundColor: backgroundColor });
     height && styles.push({ height: height, borderRadius: height });
     borderRadius && styles.push({ borderRadius: borderRadius });
+    (selectable & selected) && styles.push(containerActiveStyle)
 
     if (disabled) styles.push(disableStyle) || styles.push(style.disabledContainer);
 
