@@ -16,9 +16,6 @@ import style from "./RNChipView.style";
 class RNChipView extends Component {
   constructor(props) {
     super(props)
-    this.state = {
-      selected: false
-    }
     this._onPress = this._onPress.bind(this)
   }
 
@@ -26,6 +23,7 @@ class RNChipView extends Component {
     title: PropTypes.string,
     titleStyle: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
     titleAllowFontScaling: PropTypes.bool,
+    active: PropTypes.bool,
 
     avatar: PropTypes.oneOfType([
       PropTypes.bool,
@@ -72,6 +70,7 @@ class RNChipView extends Component {
     editable: true,
     disabled: false,
     titleAllowFontScaling: true,
+    active: false,
     theme: Avatar.Themes.Material
   };
 
@@ -96,8 +95,7 @@ class RNChipView extends Component {
     );
   }
   _onPress(...params) {
-    this.props.onPress({[this.props.value]: !this.state.selected}, ...params)
-    this.setState({selected: !this.state.selected}, () => {})
+    this.props.onPress(this.props.value, ...params)
   }
 
   _renderContent() {
@@ -112,9 +110,9 @@ class RNChipView extends Component {
       titleAllowFontScaling,
       disableTitleStyle,
       selectable,
-      titleActiveStyle
+      titleActiveStyle,
+      active
     } = this.props;
-    let { selected } = this.state
     let styles = [],
       contentContainerStyles = [],
       subStyles = [];
@@ -124,7 +122,7 @@ class RNChipView extends Component {
 
     styles.push(style.title);
     titleStyle && styles.push(titleStyle);
-    (selectable & selected) && styles.push(titleActiveStyle)
+    (selectable & active) && styles.push(titleActiveStyle)
 
     subStyles.push(style.subContentContainer);
     subStyles.push(subContentContainerStyle);
@@ -154,8 +152,7 @@ class RNChipView extends Component {
   }
 
   _renderContainer() {
-    let { backgroundColor, height, borderRadius, containerStyle, disabled, disableStyle, selectable, containerActiveStyle } = this.props;
-    let { selected } = this.state
+    let { backgroundColor, height, borderRadius, containerStyle, disabled, disableStyle, selectable, containerActiveStyle, active } = this.props;
     let styles = [];
     styles.push(style.container);
     styles.push(containerStyle);
@@ -163,7 +160,7 @@ class RNChipView extends Component {
     backgroundColor && styles.push({ backgroundColor: backgroundColor });
     height && styles.push({ height: height, borderRadius: height });
     borderRadius && styles.push({ borderRadius: borderRadius });
-    (selectable & selected) && styles.push(containerActiveStyle)
+    (selectable & active) && styles.push(containerActiveStyle)
 
     if (disabled) styles.push(disableStyle) || styles.push(style.disabledContainer);
 
