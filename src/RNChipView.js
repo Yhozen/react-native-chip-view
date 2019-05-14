@@ -14,11 +14,7 @@ import Avatar from './Avatar'
 import style from "./RNChipView.style";
 
 class RNChipView extends Component {
-  constructor(props) {
-    super(props)
-    this._onPress = this._onPress.bind(this)
-  }
-
+  
   static propTypes = {
     title: PropTypes.string,
     titleStyle: PropTypes.oneOfType([PropTypes.number, PropTypes.object]),
@@ -94,9 +90,6 @@ class RNChipView extends Component {
       </View>
     );
   }
-  _onPress(...params) {
-    this.props.onPress(this.props.value, ...params)
-  }
 
   _renderContent() {
     let {
@@ -133,7 +126,7 @@ class RNChipView extends Component {
     if (disabled) { styles.push(disableTitleStyle) || styles.push(style.disabledTitleStyle) }
 
     return (
-    <TouchableOpacity style={{ flex: 1 }} onPress={this._onPress} disabled={disabled || !editable}>
+    <TouchableOpacity style={{ flex: 1 }} onPress={this.props.onPress.bind(this, this.props.value)} disabled={disabled || !editable}>
         <View style={contentContainerStyles}>
           {this._renderAvatar()}
           <View style={[subStyles]}>
